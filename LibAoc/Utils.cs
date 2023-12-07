@@ -16,6 +16,9 @@ namespace LibAoc {
                 return;
             }
 
+            if (args.Length > 1 && args[1] == "log") {
+                LogUtils.EnableLogging = true;
+            }
             var lines = ReadLines(args[0]);
             var result = solve(lines);
             Console.WriteLine($"Result: {result}");
