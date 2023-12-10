@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aoc08", "Aoc08\Aoc08.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aoc09", "Aoc09\Aoc09.csproj", "{0FE32EDD-EBBB-4005-AC90-5906F44C77CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aoc10", "Aoc10\Aoc10.csproj", "{3A7D9732-83B6-4B51-A660-10C06B77065A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,9 @@ Global
 		{0FE32EDD-EBBB-4005-AC90-5906F44C77CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FE32EDD-EBBB-4005-AC90-5906F44C77CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FE32EDD-EBBB-4005-AC90-5906F44C77CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A7D9732-83B6-4B51-A660-10C06B77065A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A7D9732-83B6-4B51-A660-10C06B77065A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A7D9732-83B6-4B51-A660-10C06B77065A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A7D9732-83B6-4B51-A660-10C06B77065A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
