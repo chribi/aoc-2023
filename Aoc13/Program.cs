@@ -5,20 +5,9 @@ int SolvePart1(IEnumerable<string> lines) => SolvePatterns(lines, SolvePattern);
 int SolvePart2(IEnumerable<string> lines) => SolvePatterns(lines, SolveSmudgedPattern);
 
 int SolvePatterns(IEnumerable<string> lines, Func<List<string>, int> solvePattern) {
-    var current = new List<string>();
-    var sum = 0;
-    foreach (var line in lines) {
-        if (line == "") {
-            var result = solvePattern(current);
-            Log(result);
-            sum += result;
-            current = new List<string>();
-        } else {
-            current.Add(line);
-        }
-    }
-    sum += solvePattern(current);
-    return sum;
+    return Utils.SplitAtEmptyLines(lines)
+        .Select(solvePattern)
+        .Sum();
 }
 
 int SolvePattern(List<string> pattern) {
@@ -60,7 +49,7 @@ bool ReflectsAtCol(List<string> pattern, int row) {
     for (var (left, right) = (row - 1, row);
         left >= 0 && right < pattern[0].Length;
         left--, right++) {
-        if (GetColStr(pattern, left) != GetColStr(pattern, right)) return false;
+        if (Utils.GetColStr(pattern, left) != Utils.GetColStr(pattern, right)) return false;
     }
     return true;
 }
@@ -81,7 +70,7 @@ bool ReflectsSmudgedAtCol(List<string> pattern, int col) {
     for (var (left, right) = (col - 1, col);
         left >= 0 && right < pattern[0].Length;
         left--, right++) {
-        errors += CountErrors(GetColStr(pattern, left), GetColStr(pattern, right));
+        errors += CountErrors(Utils.GetColStr(pattern, left), Utils.GetColStr(pattern, right));
         if (errors > 1) return false;
     }
     return errors == 1;
@@ -93,14 +82,6 @@ int CountErrors(string a, string b) {
         if (a[i] != b[i]) errors++;
     }
     return errors;
-}
-string GetColStr(IEnumerable<string> rows, int col) {
-    var colChars = GetCol(rows, col);
-    return new string(colChars.ToArray());
-}
-
-IEnumerable<char> GetCol(IEnumerable<string> rows, int col) {
-    foreach (var row in rows) yield return row[col];
 }
 
 if (args.Length == 0) {
