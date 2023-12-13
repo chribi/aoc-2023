@@ -1,77 +1,84 @@
 using LibAoc;
 using static LibAoc.LogUtils;
 
-int SolvePart1Line(string line) {
+long SolvePart1Line(string line) {
     var row = line.Split(' ')[0];
     var nums = ParseUtils.GetNumbers(line);
     return Solve(row, nums);
 }
 
-int Solve(string row, List<long> numBroken) {
-    return SolveRec(row.ToCharArray(), numBroken, 0);
+long SolvePart2Line(string line) {
+    Log(line);
+    var row = line.Split(' ')[0];
+    var nums = ParseUtils.GetNumbers(line);
+    var unfoldedRow = $"{row}?{row}?{row}?{row}?{row}";
+    var unfoldedNums = Enumerable.Repeat(nums, 5).SelectMany(n => n).ToList();
+    return Solve(unfoldedRow, unfoldedNums);
 }
 
-int SolveRec(char[] row, List<long> numBroken, int pos) {
-    if (pos >= row.Length) return CheckFinal(row, numBroken) ? 1 : 0;
-    if (row[pos] != '?') return SolveRec(row, numBroken, pos + 1);
-    row[pos] = '#';
-    var options = 0;
-    if (Check(row, numBroken, pos + 1))
-        options = SolveRec(row, numBroken, pos + 1);
-    row[pos] = '.';
-    if (Check(row, numBroken, pos + 1))
-        options += SolveRec(row, numBroken, pos + 1);
-    row[pos] = '?';
-    return options;
-}
+long Solve(string row, List<long> groups) {
+    // partialSolutions[i, j] = Solve(row[^i..], groups[^j..]);
+    var partialSolutions = new long[row.Length + 1, groups.Count + 1];
 
-bool Check(char[] row, List<long> numBroken, int checkUntil) {
-    var actualBroken = GetBroken(row, checkUntil, out var lastComplete);
-    if (actualBroken.Count > numBroken.Count) return false;
-    for (var i = 0; i < actualBroken.Count - (lastComplete ? 0 : 1); i++) {
-        if (actualBroken[i] != numBroken[i]) return false;
+    // Initial cases
+    // Solve("", []) = 1
+    partialSolutions[0, 0] = 1;
+    // Solve("", [x, ...]) = 0
+    for (var j = 1; j < groups.Count; j++) {
+        partialSolutions[0, j] = 0;
     }
-    if (!lastComplete) {
-        var last = actualBroken.Count - 1;
-        if (actualBroken[last] > numBroken[last]) return false;
+    var i = 1;
+    // Solve(xxx, []) = xxx.All(c => c != '#') ? 1 : 0;
+    for (; i < row.Length; i++) {
+        if (row[^i] == '#') break;
+        Log($"Empty groups, tail {i} => 1");
+        partialSolutions[i, 0] = 1;
     }
-    return true;
-}
 
-bool CheckFinal(char[] row, List<long> numBroken) {
-    var actualBroken = GetBroken(row, row.Length, out _);
-    if (actualBroken.Count != numBroken.Count) return false;
-    for (var i = 0; i < actualBroken.Count; i++) {
-        if (actualBroken[i] != numBroken[i]) return false;
+    for (var l = i; l < row.Length; l++) {
+        Log($"Empty groups, tail {l} => 0");
+        partialSolutions[l, 0] = 0;
     }
-    return true;
-}
 
-List<long> GetBroken(char[] row, int untilPos, out bool lastComplete) {
-    var result = new List<long>();
-    lastComplete = true;
-    var current = 0;
-    for (var i = 0; i < untilPos; i++) {
-        if (row[i] == '.') {
-            if (current > 0)
-                result.Add(current);
-            lastComplete = true;
-            current = 0;
-        } else {
-            current++;
-            lastComplete = false;
+    // "recursive" cases
+    for (i = 1; i <= row.Length; i++) {
+        var c = row[^i];
+        for (var j = 1; j <= groups.Count; j++) {
+
+            var solutions = 0L;
+            if (c == '.' || c == '?') {
+                solutions += partialSolutions[i - 1, j];
+            }
+
+            if (c == '#' || c == '?') {
+                var n = groups[^j];
+
+                if (CanStartGroup(row, i, n)) {
+                    var iNext = Math.Max(i - n - 1, 0);
+                    solutions += partialSolutions[iNext, j - 1];
+                }
+            }
+            Log(row, string.Join(",", groups), "@", i, j, c, "=>", solutions);
+            partialSolutions[i, j] = solutions;
         }
     }
-    if (!lastComplete)
-        result.Add(current);
 
-    return result;
+    return partialSolutions[row.Length, groups.Count];
 }
 
+// i indexes from the end
+bool CanStartGroup(string row, int i, long groupSize) {
+    if (i < groupSize) return false;
+    for (var k = 0; k < groupSize; k++) {
+        if (row[^(i - k)] == '.') return false;
+    }
+    if (i == groupSize) return true;
+    return row[^(i - (int)groupSize)] != '#';
+}
 
 if (args.Length == 0) {
     EnableLogging = true;
-    var part1Cases = new (string, int)[] {
+    var part1Cases = new (string, long)[] {
         ("???.### 1,1,3", 1),
         (".??..??...?##. 1,1,3", 4),
         ("?#?#?#?#?#?#?#? 1,3,1,6", 1),
@@ -79,7 +86,17 @@ if (args.Length == 0) {
         ("????.######..#####. 1,6,5", 4),
         ("?###???????? 3,2,1", 10),
     };
+    var part2Cases = new (string, long)[] {
+        ("???.### 1,1,3", 1),
+        (".??..??...?##. 1,1,3", 16384),
+        ("?#?#?#?#?#?#?#? 1,3,1,6", 1),
+        ("????.#...#... 4,1,1", 16),
+        ("????.######..#####. 1,6,5", 2500),
+        ("?###???????? 3,2,1", 506250),
+    };
     TestUtils.Test("SolvePart1Line", SolvePart1Line, part1Cases);
+    TestUtils.Test("SolvePart2Line", SolvePart2Line, part2Cases);
 } else {
     Utils.AocMain(args, Utils.SolveLineByLine(SolvePart1Line));
+    Utils.AocMain(args, Utils.SolveLineByLine(SolvePart2Line));
 }

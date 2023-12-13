@@ -60,5 +60,9 @@ namespace LibAoc {
         public static Func<IEnumerable<string>, int> SolveLineByLine(Func<string, int> solveLine) {
             return lines => lines.Select(solveLine).Sum();
         }
+
+        public static Func<IEnumerable<string>, long> SolveLineByLine(Func<string, long> solveLine) {
+            return lines => lines.Select(solveLine).Sum();
+        }
     }
 }
