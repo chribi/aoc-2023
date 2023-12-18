@@ -32,6 +32,18 @@ namespace LibAoc {
             foreach (var row in rows) yield return row[col];
         }
 
+        public static string[] ToStringArray(char[,] chars) {
+            var result = new string[chars.GetLength(0)];
+            var b = new char[chars.GetLength(1)];
+            for (var row = 0; row < result.Length; row++) {
+                for (var col = 0; col < b.Length; col++) {
+                    b[col] = chars[row, col];
+                }
+                result[row] = new string(b);
+            }
+            return result;
+        }
+
         public static void AocMain<TResult>(string[] args, Func<IEnumerable<string>, TResult> solve) {
             if (args.Length == 0) {
                 Console.WriteLine("No input file!");
